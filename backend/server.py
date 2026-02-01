@@ -173,6 +173,10 @@ async def get_product_by_model(model: str):
     elif product.get('last_synced') is None:
         product['last_synced'] = datetime.now(timezone.utc).isoformat()
     
+    # Get current exchange rate and calculate TRY price
+    usd_to_try = await fetch_usd_try_rate()
+    product['price_try'] = calculate_final_price_try(product.get('price_value'), usd_to_try)
+    
     return product
 
 @api_router.post("/products/sync", response_model=dict)
