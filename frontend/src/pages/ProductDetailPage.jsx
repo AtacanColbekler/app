@@ -35,12 +35,12 @@ export default function ProductDetailPage() {
     }
   }, [model]);
 
-  // Format price
+  // Format price in TRY
   const formatPrice = (value) => {
     if (!value) return null;
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'TRY',
       minimumFractionDigits: 2
     }).format(value);
   };
