@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Query
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,9 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
+from typing import List, Optional
 from datetime import datetime, timezone
-
+from bson import ObjectId
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,52 +18,180 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Create the main app
+app = FastAPI(title="zenXteknoloji API")
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-
 # Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+class Product(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    supplier: str = "sektoronline"
+    category: str
+    name: str
+    model: str
+    barcode: Optional[str] = None
+    image_url: Optional[str] = None
+    stock_text: Optional[str] = None
+    price_value: Optional[float] = None
+    price_raw: Optional[str] = None
+    last_synced: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class ProductCreate(BaseModel):
+    supplier: str = "sektoronline"
+    category: str
+    name: str
+    model: str
+    barcode: Optional[str] = None
+    image_url: Optional[str] = None
+    stock_text: Optional[str] = None
+    price_value: Optional[float] = None
+    price_raw: Optional[str] = None
 
-# Add your routes to the router instead of directly to app
+class ProductResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    supplier: str
+    category: str
+    name: str
+    model: str
+    barcode: Optional[str] = None
+    image_url: Optional[str] = None
+    stock_text: Optional[str] = None
+    price_value: Optional[float] = None
+    price_raw: Optional[str] = None
+    last_synced: str
+
+class ProductSyncBatch(BaseModel):
+    products: List[ProductCreate]
+
+# Routes
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "zenXteknoloji API'ye Hoşgeldiniz"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+@api_router.get("/categories", response_model=List[str])
+async def get_categories():
+    """Get all unique categories"""
+    categories = await db.products.distinct("category")
+    return sorted(categories)
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+@api_router.get("/products", response_model=List[ProductResponse])
+async def get_products(
+    category: Optional[str] = Query(None, description="Filter by category"),
+    search: Optional[str] = Query(None, description="Search in name or model"),
+    limit: int = Query(100, ge=1, le=500)
+):
+    """Get products with optional category filter and search"""
+    query = {}
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    if category:
+        query["category"] = category
     
-    return status_checks
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"model": {"$regex": search, "$options": "i"}},
+            {"barcode": {"$regex": search, "$options": "i"}}
+        ]
+    
+    cursor = db.products.find(query, {"_id": 0}).sort("name", 1).limit(limit)
+    products = await cursor.to_list(length=limit)
+    
+    # Convert datetime to string
+    for product in products:
+        if isinstance(product.get('last_synced'), datetime):
+            product['last_synced'] = product['last_synced'].isoformat()
+        elif product.get('last_synced') is None:
+            product['last_synced'] = datetime.now(timezone.utc).isoformat()
+    
+    return products
+
+@api_router.get("/products/search", response_model=List[ProductResponse])
+async def search_products(
+    q: str = Query(..., min_length=1, description="Search query"),
+    limit: int = Query(50, ge=1, le=100)
+):
+    """Search products by name, model, or barcode"""
+    query = {
+        "$or": [
+            {"name": {"$regex": q, "$options": "i"}},
+            {"model": {"$regex": q, "$options": "i"}},
+            {"barcode": {"$regex": q, "$options": "i"}}
+        ]
+    }
+    
+    cursor = db.products.find(query, {"_id": 0}).sort("name", 1).limit(limit)
+    products = await cursor.to_list(length=limit)
+    
+    for product in products:
+        if isinstance(product.get('last_synced'), datetime):
+            product['last_synced'] = product['last_synced'].isoformat()
+        elif product.get('last_synced') is None:
+            product['last_synced'] = datetime.now(timezone.utc).isoformat()
+    
+    return products
+
+@api_router.get("/products/{model}", response_model=ProductResponse)
+async def get_product_by_model(model: str):
+    """Get single product by model"""
+    product = await db.products.find_one({"model": model}, {"_id": 0})
+    
+    if not product:
+        raise HTTPException(status_code=404, detail="Ürün bulunamadı")
+    
+    if isinstance(product.get('last_synced'), datetime):
+        product['last_synced'] = product['last_synced'].isoformat()
+    elif product.get('last_synced') is None:
+        product['last_synced'] = datetime.now(timezone.utc).isoformat()
+    
+    return product
+
+@api_router.post("/products/sync", response_model=dict)
+async def sync_products(batch: ProductSyncBatch):
+    """Sync products from n8n - upsert based on supplier + model"""
+    upserted = 0
+    updated = 0
+    
+    for product_data in batch.products:
+        product_dict = product_data.model_dump()
+        product_dict['last_synced'] = datetime.now(timezone.utc)
+        
+        result = await db.products.update_one(
+            {"supplier": product_dict['supplier'], "model": product_dict['model']},
+            {"$set": product_dict},
+            upsert=True
+        )
+        
+        if result.upserted_id:
+            upserted += 1
+        elif result.modified_count > 0:
+            updated += 1
+    
+    return {
+        "success": True,
+        "upserted": upserted,
+        "updated": updated,
+        "total": len(batch.products)
+    }
+
+@api_router.post("/products", response_model=ProductResponse)
+async def create_product(product: ProductCreate):
+    """Create or update a single product"""
+    product_dict = product.model_dump()
+    product_dict['last_synced'] = datetime.now(timezone.utc)
+    
+    await db.products.update_one(
+        {"supplier": product_dict['supplier'], "model": product_dict['model']},
+        {"$set": product_dict},
+        upsert=True
+    )
+    
+    product_dict['last_synced'] = product_dict['last_synced'].isoformat()
+    return product_dict
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -83,6 +210,16 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Create indexes on startup
+@app.on_event("startup")
+async def startup_db_client():
+    # Create indexes for faster queries
+    await db.products.create_index([("category", 1)])
+    await db.products.create_index([("model", 1)])
+    await db.products.create_index([("supplier", 1), ("model", 1)], unique=True)
+    await db.products.create_index([("name", "text"), ("model", "text")])
+    logger.info("Database indexes created")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
