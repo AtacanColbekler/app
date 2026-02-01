@@ -76,6 +76,16 @@ class ProductSyncBatch(BaseModel):
 async def root():
     return {"message": "zenXteknoloji API'ye Hoşgeldiniz"}
 
+@api_router.get("/exchange-rate")
+async def get_exchange_rate():
+    """Get current USD to TRY exchange rate"""
+    rate = await fetch_usd_try_rate()
+    return {
+        "usd_to_try": rate,
+        "profit_margin": f"{PROFIT_MARGIN * 100}%",
+        "last_updated": currency_cache["last_updated"].isoformat() if currency_cache["last_updated"] else None
+    }
+
 @api_router.get("/categories", response_model=List[str])
 async def get_categories():
     """Get all unique categories"""
