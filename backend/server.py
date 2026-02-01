@@ -146,11 +146,17 @@ async def search_products(
     cursor = db.products.find(query, {"_id": 0}).sort("name", 1).limit(limit)
     products = await cursor.to_list(length=limit)
     
+    # Get current exchange rate
+    usd_to_try = await fetch_usd_try_rate()
+    
     for product in products:
         if isinstance(product.get('last_synced'), datetime):
             product['last_synced'] = product['last_synced'].isoformat()
         elif product.get('last_synced') is None:
             product['last_synced'] = datetime.now(timezone.utc).isoformat()
+        
+        # Calculate TRY price with 20% profit
+        product['price_try'] = calculate_final_price_try(product.get('price_value'), usd_to_try)
     
     return products
 
