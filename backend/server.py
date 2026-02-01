@@ -212,6 +212,56 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Currency rate cache
+currency_cache = {
+    "usd_to_try": 36.0,  # Default fallback rate
+    "last_updated": None
+}
+
+PROFIT_MARGIN = 0.20  # 20% net profit
+
+async def fetch_usd_try_rate():
+    """Fetch real-time USD to TRY exchange rate"""
+    global currency_cache
+    
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # Try frankfurter.app (free, no API key)
+            response = await client.get("https://api.frankfurter.app/latest?from=USD&to=TRY")
+            if response.status_code == 200:
+                data = response.json()
+                rate = data.get("rates", {}).get("TRY", 36.0)
+                currency_cache["usd_to_try"] = rate
+                currency_cache["last_updated"] = datetime.now(timezone.utc)
+                logger.info(f"Updated USD/TRY rate: {rate}")
+                return rate
+    except Exception as e:
+        logger.warning(f"Failed to fetch from frankfurter: {e}")
+    
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # Fallback: exchangerate.host
+            response = await client.get("https://api.exchangerate.host/latest?base=USD&symbols=TRY")
+            if response.status_code == 200:
+                data = response.json()
+                rate = data.get("rates", {}).get("TRY", 36.0)
+                currency_cache["usd_to_try"] = rate
+                currency_cache["last_updated"] = datetime.now(timezone.utc)
+                logger.info(f"Updated USD/TRY rate from fallback: {rate}")
+                return rate
+    except Exception as e:
+        logger.warning(f"Failed to fetch from exchangerate.host: {e}")
+    
+    return currency_cache["usd_to_try"]
+
+def calculate_final_price_try(usd_price: float, usd_to_try_rate: float) -> float:
+    """Calculate final price in TRY with 20% profit margin"""
+    if usd_price is None:
+        return None
+    price_with_profit = usd_price * (1 + PROFIT_MARGIN)
+    price_in_try = price_with_profit * usd_to_try_rate
+    return round(price_in_try, 2)
+
 # Create indexes on startup
 @app.on_event("startup")
 async def startup_db_client():
