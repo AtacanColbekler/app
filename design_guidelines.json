@@ -1,0 +1,154 @@
+{
+  "project_name": "zenXteknoloji",
+  "design_philosophy": {
+    "persona": "E1: The Anti-AI Designer",
+    "archetype": "The Performance Pro + Swiss High-Contrast",
+    "core_principles": [
+      "Fusion over Imitation: Mix corporate reliability with high-tech precision.",
+      "Content is King: Products are the heroes. White space is the stage.",
+      "Contrast: Deep Royal Blue vs. Stark White. No muddy grays.",
+      "Asymmetry: Use grid offsets to create visual tension in the hero section."
+    ],
+    "emotional_tone": "Professional, Trustworthy, High-Performance, Clean"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Outfit, sans-serif",
+      "body": "Inter, sans-serif"
+    },
+    "installation": "Import from Google Fonts: https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;900&display=swap",
+    "scale": {
+      "h1": "text-5xl md:text-6xl font-bold tracking-tight",
+      "h2": "text-3xl md:text-4xl font-bold tracking-tight",
+      "h3": "text-2xl font-semibold tracking-tight",
+      "body": "text-base leading-relaxed text-slate-600",
+      "small": "text-sm font-medium text-slate-500"
+    },
+    "rules": [
+      "Never use Inter for Headings (h1-h3).",
+      "Use 'Outfit' with weight 700 or 900 for main headers to convey 'Tech Authority'.",
+      "Headings must be Dark Navy (#0F172A) or White (on blue backgrounds)."
+    ]
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "DEFAULT": "#1a1a6c",
+        "foreground": "#FFFFFF",
+        "description": "Deep Royal Blue - The anchor of trust. Used for Header, Footer, and Primary Actions."
+      },
+      "secondary": {
+        "DEFAULT": "#F1F5F9",
+        "foreground": "#0F172A",
+        "description": "Cool Slate Grey - Used for backgrounds to break up the white."
+      },
+      "accent": {
+        "DEFAULT": "#2563EB",
+        "foreground": "#FFFFFF",
+        "description": "Electric Blue - Used for 'Buy Now' buttons and active states to pop against the deep blue."
+      },
+      "background": "#FFFFFF",
+      "foreground": "#0F172A",
+      "muted": "#F8FAFC",
+      "border": "#E2E8F0"
+    },
+    "gradients": {
+      "hero": "bg-gradient-to-r from-[#1a1a6c] to-[#2a2a8c]",
+      "subtle": "bg-gradient-to-b from-white to-slate-50"
+    },
+    "rules": [
+      "No generic full-screen gradients.",
+      "Use solid blocks of Deep Blue for structural elements.",
+      "Text on Blue must be Pure White (#FFFFFF).",
+      "Text on White must be Slate 900 (#0F172A), never pure black."
+    ]
+  },
+  "layout": {
+    "grid_system": {
+      "marketing": "Grid Mode A (Tetris): 12-column grid with asymmetric spans for the Hero section.",
+      "product_list": "Grid Mode B (Density): grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6."
+    },
+    "spacing": {
+      "container_padding": "px-4 md:px-8 lg:px-12",
+      "section_spacing": "py-16 md:py-24",
+      "component_spacing": "space-y-6"
+    },
+    "sidebar": {
+      "width": "w-64",
+      "behavior": "hidden lg:block sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto border-r border-slate-100 pr-6"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-[#1a1a6c] hover:bg-[#2a2a8c] text-white rounded-md px-8 py-3 font-medium transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5",
+      "secondary": "bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 rounded-md px-6 py-3 font-medium transition-all",
+      "ghost": "text-slate-600 hover:text-[#1a1a6c] hover:bg-blue-50 rounded-md px-4 py-2"
+    },
+    "cards": {
+      "product": "group relative bg-white rounded-xl border border-slate-100 overflow-hidden hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300",
+      "feature": "bg-slate-50 rounded-lg p-8 border border-transparent hover:border-blue-100 transition-colors"
+    },
+    "inputs": {
+      "style": "rounded-md border-slate-200 focus:border-[#1a1a6c] focus:ring-[#1a1a6c] bg-white"
+    },
+    "navigation": {
+      "header": "bg-[#1a1a6c] text-white sticky top-0 z-50 shadow-md",
+      "footer": "bg-[#0F172A] text-slate-300 py-16"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "card": "shadow-[0_2px_8px_rgba(0,0,0,0.04)]",
+      "floating": "shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+    },
+    "radius": {
+      "default": "rounded-lg",
+      "button": "rounded-md"
+    },
+    "micro_interactions": [
+      "Hovering a product card should slightly lift it (-translate-y-1).",
+      "Buttons should have a subtle scale effect on click (active:scale-95).",
+      "Images should have a subtle zoom on hover (group-hover:scale-105)."
+    ]
+  },
+  "assets": {
+    "logo_url": "https://customer-assets.emergentagent.com/job_f28429eb-ca57-4b6c-8a6e-98f8289c0126/artifacts/hgjiqrqk_logo.png",
+    "placeholders": {
+      "laptop": "https://images.unsplash.com/photo-1716681863495-8061d6c3c49a?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "phone": "https://images.unsplash.com/photo-1671073437657-acdd1ca6c11d?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "gpu": "https://images.unsplash.com/photo-1761132046162-01e1b6d29dd7?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "hero_bg": "https://images.unsplash.com/photo-1716681863668-640cad27140f?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    "icons": "Use 'lucide-react' for all UI icons (Search, ShoppingCart, Menu, ChevronDown, etc.)."
+  },
+  "content_strategy": {
+    "language": "tr",
+    "static_text": {
+      "hero_title": "Teknolojinin Yeni Adresi",
+      "hero_subtitle": "En yeni bilgisayarlar, bileşenler ve aksesuarlar en uygun fiyatlarla.",
+      "search_placeholder": "Ürün ara...",
+      "categories_title": "Kategoriler",
+      "contact_title": "İletişim",
+      "address": "Kışla Mahallesi Milli Egemenlik Caddesi No:8/C Muratpaşa Antalya",
+      "phone": "+90 506 139 57 26",
+      "email": "destek@antalyabilgisayaralimsatim.com"
+    }
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'lucide-react' and 'clsx' 'tailwind-merge' if not present.",
+    "2. THEME: Update 'index.css' to override the CSS variables with the colors defined above. Set the font family globally.",
+    "3. LAYOUT: Create a 'Layout' component that includes the Header (with Logo, Search, Cart) and Footer.",
+    "4. HOME: Build the Homepage with a Hero section (Grid Mode A), a Sidebar for categories, and a Product Grid (Grid Mode B).",
+    "5. COMPONENTS: Use Shadcn UI components (Card, Button, Input, Sheet) but customize their classes to match the 'zenXteknoloji' style defined here.",
+    "6. DATA: Since there is no backend data yet, create a 'mockData.js' file with an array of 8-12 products using the placeholder images provided.",
+    "7. RESPONSIVE: Ensure the Sidebar is hidden on mobile and accessible via a Sheet/Drawer menu.",
+    "8. LANGUAGE: All visible text must be in Turkish."
+  ],
+  "universal_guidelines": [
+    "Do not use gradients for text.",
+    "Ensure all interactive elements have 'data-testid'.",
+    "Use 'sonner' for toast notifications.",
+    "Avoid 'Inter' for headings; use 'Outfit'.",
+    "Maintain high contrast for accessibility."
+  ]
+}
