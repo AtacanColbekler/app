@@ -38,9 +38,9 @@ export default function ProductDetailPage() {
   // Format price
   const formatPrice = (value) => {
     if (!value) return null;
-    return new Intl.NumberFormat('tr-TR', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'TRY',
+      currency: 'USD',
       minimumFractionDigits: 2
     }).format(value);
   };
