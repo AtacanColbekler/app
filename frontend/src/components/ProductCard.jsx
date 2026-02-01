@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export default function ProductCard({ product }) {
-  const { name, model, image_url, stock_text, price_value, price_raw, category } = product;
+  const { name, model, image_url, stock_text, price_try, price_raw, category } = product;
 
   // Determine stock status styling
   const getStockStyle = (stockText) => {
