@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
   if (!product) return null;
 
   const stockStyle = getStockStyle(product.stock_text);
-  const formattedPrice = formatPrice(product.price_value);
+  const formattedPrice = formatPrice(product.price_try);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
