@@ -62,8 +62,9 @@ class ProductResponse(BaseModel):
     barcode: Optional[str] = None
     image_url: Optional[str] = None
     stock_text: Optional[str] = None
-    price_value: Optional[float] = None
+    price_value: Optional[float] = None  # Original USD price
     price_raw: Optional[str] = None
+    price_try: Optional[float] = None  # Final TRY price with profit
     last_synced: str
 
 class ProductSyncBatch(BaseModel):
