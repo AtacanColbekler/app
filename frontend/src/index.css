@@ -117,6 +117,15 @@ code {
     height: 8px;
 }
 
+/* Hide Emergent badge */
+#emergent-badge,
+[id*="emergent-badge"],
+a[href*="emergent"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
 ::-webkit-scrollbar-track {
     background: #f1f5f9;
 }
