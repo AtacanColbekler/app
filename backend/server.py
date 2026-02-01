@@ -152,29 +152,28 @@ async def get_product_by_model(model: str):
 
 @api_router.post("/products/sync", response_model=dict)
 async def sync_products(batch: ProductSyncBatch):
-    """Sync products from n8n - upsert based on supplier + model"""
-    upserted = 0
-    updated = 0
+    """Sync products from n8n - deletes all existing products and inserts new ones"""
+    # Delete all existing products first
+    delete_result = await db.products.delete_many({})
+    deleted_count = delete_result.deleted_count
     
-    for product_data in batch.products:
-        product_dict = product_data.model_dump()
-        product_dict['last_synced'] = datetime.now(timezone.utc)
+    # Insert all new products
+    inserted_count = 0
+    if batch.products:
+        products_to_insert = []
+        for product_data in batch.products:
+            product_dict = product_data.model_dump()
+            product_dict['last_synced'] = datetime.now(timezone.utc)
+            products_to_insert.append(product_dict)
         
-        result = await db.products.update_one(
-            {"supplier": product_dict['supplier'], "model": product_dict['model']},
-            {"$set": product_dict},
-            upsert=True
-        )
-        
-        if result.upserted_id:
-            upserted += 1
-        elif result.modified_count > 0:
-            updated += 1
+        if products_to_insert:
+            result = await db.products.insert_many(products_to_insert)
+            inserted_count = len(result.inserted_ids)
     
     return {
         "success": True,
-        "upserted": upserted,
-        "updated": updated,
+        "deleted": deleted_count,
+        "inserted": inserted_count,
         "total": len(batch.products)
     }
 
