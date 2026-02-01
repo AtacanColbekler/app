@@ -25,17 +25,17 @@ export default function ProductCard({ product }) {
 
   const stockStyle = getStockStyle(stock_text);
 
-  // Format price
+  // Format price in TRY
   const formatPrice = (value) => {
     if (!value) return null;
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'TRY',
       minimumFractionDigits: 2
     }).format(value);
   };
 
-  const formattedPrice = formatPrice(price_value);
+  const formattedPrice = formatPrice(price_try);
 
   return (
     <Link 
