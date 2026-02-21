@@ -113,20 +113,16 @@ async def get_products(
             {"barcode": {"$regex": search, "$options": "i"}}
         ]
     
-    # Filter by stock status
+    # Filter by stock status - show only products with stock > 0
     if in_stock:
-        query["$and"] = query.get("$and", [])
-        query["$and"].append({
-            "$or": [
-                {"stock_text": {"$regex": "stok.*var", "$options": "i"}},
-                {"stock_text": {"$regex": "stokta", "$options": "i"}},
-                {"stock_text": {"$regex": "mevcut", "$options": "i"}},
-                {"stock_text": {"$regex": "^[1-9]", "$options": "i"}},  # Starts with number > 0
-                {"stock_text": {"$not": {"$regex": "yok|tükendi|bitti", "$options": "i"}}}
-            ]
-        })
-        # Exclude out of stock
-        query["stock_text"] = {"$not": {"$regex": "yok|tükendi|bitti|stok.*0", "$options": "i"}}
+        query["$nor"] = [
+            {"stock_text": {"$regex": "^Stok\\s*:\\s*0$", "$options": "i"}},  # Exactly "Stok : 0"
+            {"stock_text": {"$regex": "yok", "$options": "i"}},
+            {"stock_text": {"$regex": "tükendi", "$options": "i"}},
+            {"stock_text": {"$regex": "bitti", "$options": "i"}},
+            {"stock_text": None},
+            {"stock_text": ""}
+        ]
     
     # Determine sort order
     if sort == "price_asc":
