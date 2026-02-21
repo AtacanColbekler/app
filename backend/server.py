@@ -97,6 +97,7 @@ async def get_products(
     category: Optional[str] = Query(None, description="Filter by category"),
     search: Optional[str] = Query(None, description="Search in name or model"),
     sort: Optional[str] = Query("name", description="Sort by: name, price_asc, price_desc"),
+    in_stock: Optional[bool] = Query(False, description="Show only in-stock products"),
     limit: int = Query(100, ge=1, le=500)
 ):
     """Get products with optional category filter and search"""
@@ -111,6 +112,21 @@ async def get_products(
             {"model": {"$regex": search, "$options": "i"}},
             {"barcode": {"$regex": search, "$options": "i"}}
         ]
+    
+    # Filter by stock status
+    if in_stock:
+        query["$and"] = query.get("$and", [])
+        query["$and"].append({
+            "$or": [
+                {"stock_text": {"$regex": "stok.*var", "$options": "i"}},
+                {"stock_text": {"$regex": "stokta", "$options": "i"}},
+                {"stock_text": {"$regex": "mevcut", "$options": "i"}},
+                {"stock_text": {"$regex": "^[1-9]", "$options": "i"}},  # Starts with number > 0
+                {"stock_text": {"$not": {"$regex": "yok|tükendi|bitti", "$options": "i"}}}
+            ]
+        })
+        # Exclude out of stock
+        query["stock_text"] = {"$not": {"$regex": "yok|tükendi|bitti|stok.*0", "$options": "i"}}
     
     # Determine sort order
     if sort == "price_asc":
