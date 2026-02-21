@@ -90,7 +90,18 @@ export default function HomePage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* In stock filter */}
+                <Button
+                  variant={inStockOnly ? "default" : "outline"}
+                  className={`gap-2 ${inStockOnly ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
+                  onClick={() => setInStockOnly(!inStockOnly)}
+                  data-testid="in-stock-btn"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {inStockOnly ? "Stokta Olanlar" : "Sadece Stokta"}
+                </Button>
+
                 {/* Sort button */}
                 <Button
                   variant={sortOrder === "price_asc" ? "default" : "outline"}
