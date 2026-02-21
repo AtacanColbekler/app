@@ -183,8 +183,7 @@ async def get_product_by_model(model: str):
 async def sync_products(batch: ProductSyncBatch):
     """Sync products from n8n - deletes all existing products and inserts new ones"""
     # Delete all existing products first
-    delete_result = await db.products.delete_many({})
-    deleted_count = delete_result.deleted_count
+    
     
     # Insert all new products
     inserted_count = 0
@@ -205,6 +204,17 @@ async def sync_products(batch: ProductSyncBatch):
         "inserted": inserted_count,
         "total": len(batch.products)
     }
+
+@api_router.post("/products/drop", response_model=dict)
+async def drop_products():
+    delete_result = await db.products.delete_many({})
+    deleted_count = delete_result.deleted_count
+
+    return {
+        "success": True,
+        "deleted": deleted_count
+    }
+
 
 @api_router.post("/products", response_model=ProductResponse)
 async def create_product(product: ProductCreate):
