@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Filter, Package, ArrowUpDown } from "lucide-react";
+import { Filter, Package, ArrowUpDown, CheckCircle } from "lucide-react";
 import CategorySidebar from "@/components/CategorySidebar";
 import ProductGrid from "@/components/ProductGrid";
 
@@ -15,12 +15,13 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("name");
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const params = { sort: sortOrder };
+        const params = { sort: sortOrder, in_stock: inStockOnly };
         if (category) {
           params.category = decodeURIComponent(category);
         }
@@ -36,7 +37,7 @@ export default function HomePage() {
     };
 
     fetchProducts();
-  }, [category, sortOrder]);
+  }, [category, sortOrder, inStockOnly]);
 
   const decodedCategory = category ? decodeURIComponent(category) : null;
 
