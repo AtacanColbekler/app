@@ -76,7 +76,7 @@ export default function HomePage() {
           {/* Products Section */}
           <main className="flex-1 min-w-0">
             {/* Mobile filter button & Title */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
               <div>
                 <h2 
                   className="text-2xl md:text-3xl font-bold text-slate-900 font-outfit"
@@ -89,27 +89,40 @@ export default function HomePage() {
                 </p>
               </div>
 
-              {/* Mobile filter */}
-              <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
-                <SheetTrigger asChild className="lg:hidden">
-                  <Button 
-                    variant="outline" 
-                    className="gap-2"
-                    data-testid="mobile-filter-btn"
-                  >
-                    <Filter className="w-4 h-4" />
-                    Filtrele
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-80 p-0">
-                  <div className="p-4 bg-[#1a1a6c] text-white">
-                    <h2 className="font-semibold font-outfit">Kategoriler</h2>
-                  </div>
-                  <div className="p-4">
-                    <CategorySidebar onCategorySelect={() => setMobileFilterOpen(false)} />
-                  </div>
-                </SheetContent>
-              </Sheet>
+              <div className="flex items-center gap-2">
+                {/* Sort button */}
+                <Button
+                  variant={sortOrder === "price_asc" ? "default" : "outline"}
+                  className={`gap-2 ${sortOrder === "price_asc" ? "bg-[#1a1a6c] hover:bg-[#2a2a8c]" : ""}`}
+                  onClick={() => setSortOrder(sortOrder === "price_asc" ? "name" : "price_asc")}
+                  data-testid="sort-price-btn"
+                >
+                  <ArrowUpDown className="w-4 h-4" />
+                  {sortOrder === "price_asc" ? "Fiyat: Düşükten Yükseğe" : "Fiyata Göre Sırala"}
+                </Button>
+
+                {/* Mobile filter */}
+                <Sheet open={mobileFilterOpen} onOpenChange={setMobileFilterOpen}>
+                  <SheetTrigger asChild className="lg:hidden">
+                    <Button 
+                      variant="outline" 
+                      className="gap-2"
+                      data-testid="mobile-filter-btn"
+                    >
+                      <Filter className="w-4 h-4" />
+                      Filtrele
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80 p-0">
+                    <div className="p-4 bg-[#1a1a6c] text-white">
+                      <h2 className="font-semibold font-outfit">Kategoriler</h2>
+                    </div>
+                    <div className="p-4">
+                      <CategorySidebar onCategorySelect={() => setMobileFilterOpen(false)} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
             </div>
 
             {/* Info banner when no products */}
