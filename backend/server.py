@@ -96,6 +96,7 @@ async def get_categories():
 async def get_products(
     category: Optional[str] = Query(None, description="Filter by category"),
     search: Optional[str] = Query(None, description="Search in name or model"),
+    sort: Optional[str] = Query("name", description="Sort by: name, price_asc, price_desc"),
     limit: int = Query(100, ge=1, le=500)
 ):
     """Get products with optional category filter and search"""
@@ -111,7 +112,15 @@ async def get_products(
             {"barcode": {"$regex": search, "$options": "i"}}
         ]
     
-    cursor = db.products.find(query, {"_id": 0}).sort("name", 1).limit(limit)
+    # Determine sort order
+    if sort == "price_asc":
+        sort_field = [("price_value", 1)]
+    elif sort == "price_desc":
+        sort_field = [("price_value", -1)]
+    else:
+        sort_field = [("name", 1)]
+    
+    cursor = db.products.find(query, {"_id": 0}).sort(sort_field).limit(limit)
     products = await cursor.to_list(length=limit)
     
     # Get current exchange rate
@@ -139,7 +148,8 @@ async def search_products(
         "$or": [
             {"name": {"$regex": q, "$options": "i"}},
             {"model": {"$regex": q, "$options": "i"}},
-            {"barcode": {"$regex": q, "$options": "i"}}
+            {"barcode": {"$regex": q, "$options": "i"}},
+            {"category": {"$regex": q, "$options": "i"}}
         ]
     }
     
