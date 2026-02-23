@@ -205,7 +205,7 @@ async def get_product_by_model(model: str):
 async def sync_products(batch: ProductSyncBatch):
     """Sync products from n8n - deletes all existing products and inserts new ones"""
     # Delete all existing products first
-    
+    deleted_count = 0    
     
     # Insert all new products
     inserted_count = 0
@@ -258,12 +258,16 @@ app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=[
+        "http://localhost",
+        "http://127.0.0.1",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,

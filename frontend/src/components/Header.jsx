@@ -7,6 +7,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const LOGO_URL = "https://customer-assets.emergentagent.com/job_f28429eb-ca57-4b6c-8a6e-98f8289c0126/artifacts/hgjiqrqk_logo.png";
 
+const STATIC_MENU_ITEMS = [
+  { label: "Ana Sayfa", to: "/" },
+  { label: "Dizüstü Bilgisayar", to: "/ara?q=ekran" },
+  { label: "Masaüstü Bilgisayar", to: "/kategori/MasaUstuBilgisayarlar" },
+  { label: "Oyuncu Ekipmanları", to: "/kategori/Oyuncu%20Ekipmanlar%C4%B1" },
+  { label: "Ağ & Network", to: "/kategori/A%C4%9F%20%C3%9Cr%C3%BCnleri" },
+];
+
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -99,14 +107,17 @@ export default function Header() {
                     </div>
                   </form>
                   <nav className="space-y-2">
-                    <Link 
-                      to="/" 
-                      className="block py-2 px-3 rounded-md hover:bg-slate-100 font-medium"
-                      onClick={() => setMobileMenuOpen(false)}
-                      data-testid="mobile-home-link"
-                    >
-                      Ana Sayfa
-                    </Link>
+                     {STATIC_MENU_ITEMS.map((item) => (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        className="block py-2 px-3 rounded-md hover:bg-slate-100 font-medium"
+                        onClick={() => setMobileMenuOpen(false)}
+                        data-testid={`mobile-menu-link-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
                   </nav>
                   <div className="mt-6 pt-6 border-t">
                     <p className="text-sm text-slate-500 mb-2">İletişim</p>
@@ -198,6 +209,23 @@ export default function Header() {
           </form>
         </div>
       </div>
+      <nav className="hidden lg:block bg-white border-b border-slate-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <ul className="flex items-center gap-2 xl:gap-4 overflow-x-auto py-3">
+            {STATIC_MENU_ITEMS.map((item) => (
+              <li key={item.to}>
+                <Link
+                  to={item.to}
+                  className="inline-flex whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-[#1a1a6c]"
+                  data-testid={`desktop-menu-link-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
     </header>
   );
 }
