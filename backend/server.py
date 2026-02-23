@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from bson import ObjectId
 import httpx
 import asyncio
+import re
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -155,19 +156,21 @@ async def search_products(
     q: str = Query(..., min_length=1, description="Search query"),
     limit: int = Query(50, ge=1, le=100)
 ):
-    """Search products by name, model, or barcode"""
+    """Search products by category using one or more words"""
+    words = [re.escape(word) for word in q.strip().split() if word]
+    if not words:
+        raise HTTPException(status_code=400, detail="Search query must include at least one non-space word")
+
     query = {
         "$or": [
-            {"name": {"$regex": q, "$options": "i"}},
-            {"model": {"$regex": q, "$options": "i"}},
-            {"barcode": {"$regex": q, "$options": "i"}},
-            {"category": {"$regex": q, "$options": "i"}}
+            {"category": {"$regex": rf"(?<!\S){word}(?!\S)", "$options": "i"}}
+            for word in words
         ]
     }
     
     cursor = db.products.find(query, {"_id": 0}).sort("name", 1).limit(limit)
     products = await cursor.to_list(length=limit)
-    
+           
     # Get current exchange rate
     usd_to_try = await fetch_usd_try_rate()
     
