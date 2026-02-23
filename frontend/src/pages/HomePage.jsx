@@ -68,7 +68,7 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
+          <aside className="hidden w-64 flex-shrink-0">
             <div className="sticky top-28">
               <CategorySidebar />
             </div>

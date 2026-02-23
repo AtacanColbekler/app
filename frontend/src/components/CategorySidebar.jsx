@@ -28,7 +28,8 @@ export default function CategorySidebar({ onCategorySelect }) {
 
   if (loading) {
     return (
-      <div className="space-y-2">
+      // To show in DevTools: remove the "invisible" class
+      <div className="invisible space-y-2">
         {[...Array(8)].map((_, i) => (
           <div key={i} className="h-10 bg-slate-100 rounded-md skeleton" />
         ))}
@@ -37,7 +38,8 @@ export default function CategorySidebar({ onCategorySelect }) {
   }
 
   return (
-    <div className="bg-white rounded-xl border border-slate-100 overflow-hidden">
+    // To show in DevTools: remove the "invisible" class
+    <div className="invisible bg-white rounded-xl border border-slate-100 overflow-hidden">
       <div className="bg-[#1a1a6c] text-white px-4 py-3">
         <div className="flex items-center gap-2">
           <Layers className="w-5 h-5" />
