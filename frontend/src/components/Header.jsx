@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Menu, Phone, Mail, ChevronRight, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -520,12 +521,23 @@ const STATIC_MENU_ITEMS = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-//  DESKTOP: Level-3 flyout (grandchildren)
+//  DESKTOP: Portal dropdown — renders via fixed positioning
+//  so it escapes ALL overflow:hidden/auto ancestors.
 // ─────────────────────────────────────────────────────────────
-function FlyoutSubmenu({ items, visible }) {
-  if (!visible || !items?.length) return null;
-  return (
-    <div className="absolute left-full top-0 ml-1 w-52 bg-white rounded-md shadow-xl border border-slate-100 py-1 z-[99999]">
+function FlyoutSubmenu({ items, visible, anchorRect }) {
+  if (!visible || !items?.length || !anchorRect) return null;
+  const width = 208;
+  // Flip left if flyout would overflow right edge of viewport
+  const overflowsRight = anchorRect.right + 0 + width > window.innerWidth;
+  const style = {
+    position: "fixed",
+    top: anchorRect.top,
+    left: overflowsRight ? anchorRect.left - width - 0 : anchorRect.right + 0,
+    width,
+    zIndex: 99999,
+  };
+  return createPortal(
+    <div style={style} className="bg-white rounded-md shadow-xl border border-slate-100 py-1">
       {items.map((item) => (
         <Link
           key={item.to}
@@ -535,32 +547,58 @@ function FlyoutSubmenu({ items, visible }) {
           {item.label}
         </Link>
       ))}
-    </div>
+    </div>,
+    document.body
   );
 }
 
-// ─────────────────────────────────────────────────────────────
-//  DESKTOP: Level-2 dropdown panel
-// ─────────────────────────────────────────────────────────────
-function DropdownPanel({ item, onClose }) {
+function DropdownPortal({ item, anchorRect, onClose }) {
   const [activeChild, setActiveChild] = useState(null);
+  const [childRect, setChildRect] = useState(null);
+  const rowRef = useRef({});
 
-  if (!item?.children?.length) return null;
+  if (!item?.children?.length || !anchorRect) return null;
 
-  return (
-    <div className="absolute top-full left-0 mt-0 min-w-[220px] bg-white rounded-b-lg shadow-2xl border border-slate-100 py-1 z-[9999] overflow-visible">
+  const width = Math.max(anchorRect.width, 220);
+  // Flip left if dropdown would overflow right edge of viewport
+  const overflowsRight = anchorRect.left + width > window.innerWidth;
+  const style = {
+    position: "fixed",
+    top: anchorRect.bottom,
+    left: overflowsRight ? anchorRect.right - width : anchorRect.left,
+    width,
+    zIndex: 9999,
+  };
+
+  return createPortal(
+    <div
+      style={style}
+      className="bg-white rounded-b-lg shadow-2xl border border-slate-100 py-1"
+    >
       {item.children.map((child) => (
         <div
           key={child.to}
-          className="relative overflow-visible"
-          onMouseEnter={() => child.children?.length ? setActiveChild(child.label) : setActiveChild(null)}
+          ref={(el) => { if (el) rowRef.current[child.label] = el; }}
+          onMouseEnter={() => {
+            if (child.children?.length) {
+              const el = rowRef.current[child.label];
+              if (el) setChildRect(el.getBoundingClientRect());
+              setActiveChild(child.label);
+            } else {
+              setActiveChild(null);
+            }
+          }}
           onMouseLeave={() => setActiveChild(null)}
         >
           {child.children?.length ? (
             <div className="flex items-center justify-between px-4 py-2 text-sm text-slate-700 hover:bg-[#1a1a6c] hover:text-white cursor-pointer transition-colors group">
               <span>{child.label}</span>
               <ChevronRight className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100" />
-              <FlyoutSubmenu items={child.children} visible={activeChild === child.label} />
+              <FlyoutSubmenu
+                items={child.children}
+                visible={activeChild === child.label}
+                anchorRect={childRect}
+              />
             </div>
           ) : (
             <Link
@@ -573,20 +611,24 @@ function DropdownPanel({ item, onClose }) {
           )}
         </div>
       ))}
-    </div>
+    </div>,
+    document.body
   );
 }
 
 // ─────────────────────────────────────────────────────────────
-//  DESKTOP: Single nav item with hover dropdown
+//  DESKTOP: Single nav item — measures itself, passes rect
+//  to portal so dropdown is always positioned correctly.
 // ─────────────────────────────────────────────────────────────
 function NavItem({ item }) {
   const [open, setOpen] = useState(false);
+  const [anchorRect, setAnchorRect] = useState(null);
   const ref = useRef(null);
   const timerRef = useRef(null);
 
   const handleMouseEnter = () => {
     clearTimeout(timerRef.current);
+    if (ref.current) setAnchorRect(ref.current.getBoundingClientRect());
     setOpen(true);
   };
 
@@ -601,7 +643,6 @@ function NavItem({ item }) {
   return (
     <li
       ref={ref}
-      className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -620,7 +661,7 @@ function NavItem({ item }) {
       </Link>
 
       {hasChildren && open && (
-        <DropdownPanel item={item} onClose={() => setOpen(false)} />
+        <DropdownPortal item={item} anchorRect={anchorRect} onClose={() => setOpen(false)} />
       )}
     </li>
   );
@@ -708,12 +749,12 @@ export default function Header() {
               <span className="hidden sm:inline">+90 506 139 57 26</span>
             </a>
             <a
-              href="tel:+905411202626"
+              href="tel:+905396981753"
               className="flex items-center gap-1 hover:text-blue-300 transition-colors"
               data-testid="phone-link-2"
             >
               <Phone className="w-3 h-3" />
-              <span className="hidden sm:inline">+90 541 120 26 26</span>
+              <span className="hidden sm:inline">+90 539 698 17 53</span>
             </a>
           </div>
           <a
@@ -866,9 +907,9 @@ export default function Header() {
       </div>
 
       {/* ── Desktop nav bar ──────────────────────────────────── */}
-      <nav className="hidden lg:block bg-white border-b border-slate-200 overflow-visible">
+      <nav className="hidden lg:block bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 overflow-visible">
-          <ul className="flex items-center gap-1 py-2 overflow-visible">
+          <ul className="flex items-center gap-1 py-2 flex-wrap">
             {STATIC_MENU_ITEMS.map((item) => (
               <NavItem key={item.to} item={item} />
             ))}
