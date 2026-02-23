@@ -163,7 +163,7 @@ async def search_products(
 
     query = {
         "$or": [
-            {"category": {"$regex": word, "$options": "i"}}
+            {"category": {"$regex": rf"(?<!\S){word}(?!\S)", "$options": "i"}}
             for word in words
         ]
     }
