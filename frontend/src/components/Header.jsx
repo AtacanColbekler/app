@@ -57,8 +57,10 @@ const STATIC_MENU_ITEMS = [
         label: "İşlemciler",
         to: "/ara?q=Islemciler%20Islemci%20Chip",
         children: [
-          { label: "İşlemci",          to: "/ara?q=Islemci%20Chip" },
+          { label: "İşlemci",          to: "/ara?q=Islemci%20Islemciler" },
           { label: "İşlemci Soğutucu", to: "/ara?q=Islemci-Sogutuculari%20IslemciSogutuculari" },
+          { label: "chip", to: "/ara?q=Chip" },
+          
         ],
       },
       { label: "Anakartlar",     to: "/ara?q=Anakart%20Anakartlar" },
@@ -66,7 +68,7 @@ const STATIC_MENU_ITEMS = [
         label: "Bellekler",
         to: "/ara?q=Bellekler%20MasaUstuBellekler%20NotebookBellekler",
         children: [
-          { label: "Masaüstü Bellek", to: "/ara?q=Masaustu-Bellekler%20MasaUstuBellekler" },
+          { label: "Masaüstü Bellek", to: "/ara?q=Masaustu-Bellekler%20MasaUstuBellekler%20Bellekler" },
           { label: "Notebook Bellek", to: "/ara?q=Notebook-Bellekler%20NotebookBellekler" },
           { label: "USB Bellek",      to: "/ara?q=USB-Bellekler%20UsbBellekler" },
           { label: "Hafıza Kartı",    to: "/ara?q=Hafiza-Kartlari%20HafizaKartlari" },
@@ -83,6 +85,10 @@ const STATIC_MENU_ITEMS = [
           { label: "Notebook HDD",     to: "/ara?q=NotebookEkran" },
           { label: "HDD Kutu & Dock",  to: "/ara?q=HDD-Kutulari---Dock%20hddkutu" },
           { label: "HDD Aksesuarları", to: "/ara?q=DiskKizak%20DepolamaUniteleri" },
+          { label: "Aksesuarlar", to: "/ara?q=Aksesuarlar" },
+          { label: "Diskler", to: "/ara?q=Diskler" },
+          
+          
         ],
       },
       { label: "Ekran Kartları",  to: "/ara?q=Ekran-Kartlari%20EkranKarti" },
@@ -187,6 +193,8 @@ const STATIC_MENU_ITEMS = [
           { label: "Kutu Lisans", to: "/ara?q=Kutu-Lisans" },
           { label: "Open Lisans", to: "/ara?q=Online" },
           { label: "ESD Online",  to: "/ara?q=ESD---Online-Lisans" },
+          { label: "Isletim Sistemleri",  to: "/ara?q=IsletimSistemleri" },
+          
         ],
       },
       {
@@ -196,6 +204,8 @@ const STATIC_MENU_ITEMS = [
           { label: "Kutu Office", to: "/ara?q=Kutu-Office-Lisans" },
           { label: "Open Office", to: "/ara?q=Online" },
           { label: "ESD Office",  to: "/ara?q=ESD-(Office-Online-Lisans)" },
+          { label: "Ofis Uygulamalari",  to: "/ara?q=OfisUygulamalari" },
+          
         ],
       },
       {
@@ -204,6 +214,8 @@ const STATIC_MENU_ITEMS = [
         children: [
           { label: "OEM & ROK",    to: "/ara?q=OEM---ROK-Lisans" },
           { label: "Open Sunucu", to: "/ara?q=Online" },
+          { label: "Sunucu Lisanslari", to: "/ara?q=SunucuLisanlari" },
+          
         ],
       },
       {
@@ -227,7 +239,7 @@ const STATIC_MENU_ITEMS = [
         to: "/ara?q=KablosuzAgUrunleri%20AccessPoint%20Router",
         children: [
           { label: "Access Point & Router", to: "/ara?q=Access-Point-ve-Router%20AccessPoint" },
-          { label: "Home Router",           to: "/ara?q=Home-Router%20Router" },
+          { label: "Home Router",           to: "/ara?q=Home-Router%20Router%20KablosuzAgUrunleri%20Modem%20Modemler" },
           { label: "Hotspot / Gateway",     to: "/ara?q=Hotspot-Gateway" },
           { label: "PoE Adaptör/Enjector",  to: "/ara?q=PoE-Adaptor-Enjector%20PoeUrunleri" },
           { label: "Kablosuz USB Adaptör",  to: "/ara?q=Kablosuz-USB-Adaptor" },
@@ -246,6 +258,7 @@ const STATIC_MENU_ITEMS = [
           { label: "SFP / Gbic Modül",    to: "/ara?q=SFP-Gbic-Modul" },
           { label: "Fiber / Omurga",      to: "/ara?q=Fiber-Omurga-Switchler" },
           { label: "Endüstriyel Switch",  to: "/ara?q=Endustriyel-Switchler" },
+          { label: "Sade Switch",  to: "/ara?q=Switch" },
         ],
       },
       { label: "Patch Panel",  to: "/ara?q=Patch-Panel" },
@@ -264,7 +277,7 @@ const STATIC_MENU_ITEMS = [
         to: "/ara?q=CatKablo%20PatchKablo%20CAT6-UTP---FTP-Kablolar",
         children: [
           { label: "Patch Kablo",    to: "/ara?q=Patch-Kablolar%20PatchKablo" },
-          { label: "CAT6 UTP / FTP", to: "/ara?q=CAT6-UTP---FTP-Kablolar" },
+          { label: "CAT6 UTP / FTP", to: "/ara?q=CAT6-UTP---FTP-Kablolar%20CatKablo" },
         ],
       },
       {
@@ -310,7 +323,7 @@ const STATIC_MENU_ITEMS = [
         label: "Kabinler",
         to: "/ara?q=Kabinler%20Kabin",
         children: [
-          { label: "Kabin",             to: "/ara?q=Kabin" },
+          { label: "Kabin",             to: "/ara?q=Kabin%20Kabinler" },
           { label: "Kabin Aksesuarları",to: "/ara?q=Kabin-Aksesuarlari%20KabinAksesuar%20Aksesuarlar" },
         ],
       },
@@ -324,7 +337,7 @@ const STATIC_MENU_ITEMS = [
     children: [
       { label: "Line Interactive UPS", to: "/ara?q=Line-Interactive-UPS%20LineInteractive" },
       { label: "Online UPS",           to: "/ara?q=Online-UPS" },
-      { label: "Akü",                  to: "/ara?q=Aku%20Akuler%20DVRPIL" },
+      { label: "Akü",                  to: "/ara?q=Aku%20Akuler" },
       { label: "Korumalı Prizler",     to: "/ara?q=Korumali-Prizler%20PrizCevirici" },
     ],
   },
@@ -381,6 +394,8 @@ const STATIC_MENU_ITEMS = [
         children: [
           { label: "DVR", to: "/ara?q=DVR-Cihazlar%20DvrCihazlar" },
           { label: "NVR", to: "/ara?q=NVR-Cihazlar%20NvrCihazlar" },
+          { label: "DVRPIL", to: "/ara?q=DVRPIL" },
+          
         ],
       },
       {
@@ -409,6 +424,10 @@ const STATIC_MENU_ITEMS = [
           { label: "Bağlantı Ekipmanı",  to: "/ara?q=Baglanti-Ekipmanlari%20BaglantiEkipmanlari" },
           { label: "Güvenlik Adaptörü",  to: "/ara?q=Guvenlik-Adaptorleri%20GuvenlikAdaptorleri" },
           { label: "Kontrol Klavyesi",   to: "/ara?q=Kontrol-Klavyesi" },
+          { label: "Kamera Aksesuar",   to: "/ara?q=KameraAksesuar" },
+          { label: "Kanal Aksesuar",   to: "/ara?q=KanalAksesuar" },
+          
+          
         ],
       },
       {
