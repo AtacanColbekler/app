@@ -162,7 +162,7 @@ async def search_products(
         raise HTTPException(status_code=400, detail="Search query must include at least one non-space word")
 
     query = {
-        "$and": [
+        "$or": [
             {"category": {"$regex": word, "$options": "i"}}
             for word in words
         ]
