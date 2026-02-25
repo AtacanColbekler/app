@@ -154,6 +154,8 @@ async def get_products(
 @api_router.get("/products/search", response_model=List[ProductResponse])
 async def search_products(
     q: str = Query(..., min_length=1, description="Search query"),
+    sort: Optional[str] = Query("name", description="Sort by: name, price_asc, price_desc"),
+    in_stock: Optional[bool] = Query(False, description="Show only in-stock products"),
     limit: int = Query(50, ge=1, le=100)
 ):
     """Search products by category using one or more words"""
@@ -167,8 +169,27 @@ async def search_products(
             for word in words
         ]
     }
+
+    # Filter by stock status
+    if in_stock:
+        query["$nor"] = [
+            {"stock_text": {"$regex": "^Stok\\s*:\\s*0$", "$options": "i"}},
+            {"stock_text": {"$regex": "yok", "$options": "i"}},
+            {"stock_text": {"$regex": "tükendi", "$options": "i"}},
+            {"stock_text": {"$regex": "bitti", "$options": "i"}},
+            {"stock_text": None},
+            {"stock_text": ""}
+        ]
+
+    # Determine sort order
+    if sort == "price_asc":
+        sort_field = [("price_value", 1)]
+    elif sort == "price_desc":
+        sort_field = [("price_value", -1)]
+    else:
+        sort_field = [("name", 1)]
     
-    cursor = db.products.find(query, {"_id": 0}).sort("name", 1).limit(limit)
+    cursor = db.products.find(query, {"_id": 0}).sort(sort_field).limit(limit)
     products = await cursor.to_list(length=limit)
            
     # Get current exchange rate

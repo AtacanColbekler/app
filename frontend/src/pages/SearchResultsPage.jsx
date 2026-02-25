@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, ArrowUpDown, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProductGrid from "@/components/ProductGrid";
 
@@ -12,6 +12,8 @@ export default function SearchResultsPage() {
   const query = searchParams.get("q") || "";
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState("name");
+  const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
     const searchProducts = async () => {
@@ -24,7 +26,7 @@ export default function SearchResultsPage() {
       setLoading(true);
       try {
         const response = await axios.get(`${API}/products/search`, {
-          params: { q: query }
+          params: { q: query, sort: sortOrder, in_stock: inStockOnly }
         });
         setProducts(response.data);
       } catch (error) {
@@ -36,7 +38,7 @@ export default function SearchResultsPage() {
     };
 
     searchProducts();
-  }, [query]);
+  }, [query, sortOrder, inStockOnly]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
@@ -53,20 +55,51 @@ export default function SearchResultsPage() {
 
         {/* Search header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-[#1a1a6c] rounded-full flex items-center justify-center">
-              <Search className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#1a1a6c] rounded-full flex items-center justify-center">
+                <Search className="w-5 h-5 text-white" />
+              </div>
+              <h1 
+                className="text-2xl md:text-3xl font-bold text-slate-900 font-outfit"
+                data-testid="search-title"
+              >
+                Arama Sonuçları
+              </h1>
             </div>
-            <h1 
-              className="text-2xl md:text-3xl font-bold text-slate-900 font-outfit"
-              data-testid="search-title"
-            >
-              Arama Sonuçları
-            </h1>
+
+            {/* Filter & Sort buttons — only shown when there's a query */}
+            {query && (
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* In stock filter */}
+                <Button
+                  variant={inStockOnly ? "default" : "outline"}
+                  className={`gap-2 ${inStockOnly ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
+                  onClick={() => setInStockOnly(!inStockOnly)}
+                  data-testid="in-stock-btn"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {inStockOnly ? "Stokta Olanlar" : "Sadece Stokta"}
+                </Button>
+
+                {/* Sort button */}
+                <Button
+                  variant={sortOrder === "price_asc" ? "default" : "outline"}
+                  className={`gap-2 ${sortOrder === "price_asc" ? "bg-[#1a1a6c] hover:bg-[#2a2a8c]" : ""}`}
+                  onClick={() => setSortOrder(sortOrder === "price_asc" ? "name" : "price_asc")}
+                  data-testid="sort-price-btn"
+                >
+                  <ArrowUpDown className="w-4 h-4" />
+                  {sortOrder === "price_asc" ? "Fiyat: Düşükten Yükseğe" : "Fiyata Göre Sırala"}
+                </Button>
+              </div>
+            )}
           </div>
+
           {query && (
             <p className="text-slate-600" data-testid="search-query-display">
-              "<span className="font-medium text-[#1a1a6c]">{query}</span>" için {loading ? "aranıyor..." : `${products.length} sonuç bulundu`}
+              "<span className="font-medium text-[#1a1a6c]">{query}</span>" için {loading ?
+              "aranıyor..." : `${products.length} sonuç bulundu`}
             </p>
           )}
         </div>
