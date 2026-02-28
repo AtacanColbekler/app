@@ -743,7 +743,7 @@ export default function Header() {
     (e) => {
       e.preventDefault();
       if (searchQuery.trim()) {
-        navigate(`/ara?q=${encodeURIComponent(searchQuery.trim())}`);
+        navigate(`/ara-urun?q=${encodeURIComponent(searchQuery.trim())}`);
         setSearchQuery("");
       }
     },

@@ -1,0 +1,150 @@
+import { useEffect, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import axios from "axios";
+import { ArrowLeft, Search, ArrowUpDown, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import ProductGrid from "@/components/ProductGrid";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+export default function NameSearchResultsPage() {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q") || "";
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [sortOrder, setSortOrder] = useState("name");
+  const [inStockOnly, setInStockOnly] = useState(false);
+
+  useEffect(() => {
+    const searchProducts = async () => {
+      if (!query.trim()) {
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await axios.get(`${API}/products/search/name`, {
+          params: { q: query, sort: sortOrder, in_stock: inStockOnly },
+        });
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Arama hatası:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    searchProducts();
+  }, [query, sortOrder, inStockOnly]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Back button */}
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-slate-600 hover:text-[#1a1a6c] mb-8 transition-colors"
+          data-testid="name-search-back-link"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Ana Sayfaya Dön</span>
+        </Link>
+
+        {/* Header row */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#1a1a6c] rounded-full flex items-center justify-center">
+                <Search className="w-5 h-5 text-white" />
+              </div>
+              <h1
+                className="text-2xl md:text-3xl font-bold text-slate-900 font-outfit"
+                data-testid="name-search-title"
+              >
+                Ürün Arama Sonuçları
+              </h1>
+            </div>
+
+            {/* Sort & filter buttons — only when there is a query */}
+            {query && (
+              <div className="flex items-center gap-2 flex-wrap">
+                <Button
+                  variant={inStockOnly ? "default" : "outline"}
+                  className={`gap-2 ${inStockOnly ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
+                  onClick={() => setInStockOnly(!inStockOnly)}
+                  data-testid="in-stock-btn"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  {inStockOnly ? "Stokta Olanlar" : "Sadece Stokta"}
+                </Button>
+
+                <Button
+                  variant={sortOrder === "price_asc" ? "default" : "outline"}
+                  className={`gap-2 ${sortOrder === "price_asc" ? "bg-[#1a1a6c] hover:bg-[#2a2a8c]" : ""}`}
+                  onClick={() => setSortOrder(sortOrder === "price_asc" ? "name" : "price_asc")}
+                  data-testid="sort-price-btn"
+                >
+                  <ArrowUpDown className="w-4 h-4" />
+                  {sortOrder === "price_asc" ? "Fiyat: Düşükten Yükseğe" : "Fiyata Göre Sırala"}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {query && (
+            <p className="text-slate-600" data-testid="name-search-query-display">
+              "<span className="font-medium text-[#1a1a6c]">{query}</span>" için{" "}
+              {loading ? "aranıyor..." : `${products.length} ürün bulundu`}
+            </p>
+          )}
+        </div>
+
+        {/* No query state */}
+        {!query && (
+          <div className="text-center py-16 bg-slate-50 rounded-xl">
+            <Search className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-slate-700 mb-2 font-outfit">Arama Yapın</h2>
+            <p className="text-slate-500 mb-6">
+              Ürün aramak için yukarıdaki arama kutusunu kullanın.
+            </p>
+            <Link to="/">
+              <Button className="bg-[#1a1a6c] hover:bg-[#2a2a8c]">
+                Tüm Ürünleri Görüntüle
+              </Button>
+            </Link>
+          </div>
+        )}
+
+        {/* Results */}
+        {query && (
+          <>
+            {!loading && products.length === 0 && (
+              <div
+                className="text-center py-16 bg-slate-50 rounded-xl"
+                data-testid="no-results"
+              >
+                <Search className="w-16 h-16 text-slate-300 mx-auto mb-4" />
+                <h2 className="text-xl font-semibold text-slate-700 mb-2 font-outfit">
+                  Sonuç Bulunamadı
+                </h2>
+                <p className="text-slate-500 mb-6">
+                  "{query}" için ürün bulunamadı. Farklı bir isim veya model numarası deneyin.
+                </p>
+                <Link to="/">
+                  <Button className="bg-[#1a1a6c] hover:bg-[#2a2a8c]">
+                    Tüm Ürünleri Görüntüle
+                  </Button>
+                </Link>
+              </div>
+            )}
+
+            <ProductGrid products={products} loading={loading} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

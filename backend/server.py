@@ -93,6 +93,8 @@ async def get_categories():
     categories = await db.products.distinct("category")
     return sorted(categories)
 
+
+
 @api_router.get("/products", response_model=List[ProductResponse])
 async def get_products(
     category: Optional[str] = Query(None, description="Filter by category"),
@@ -151,6 +153,58 @@ async def get_products(
     
     return products
 
+@api_router.get("/products/search/name", response_model=List[ProductResponse])
+async def search_products_by_name(
+    q: str = Query(..., min_length=1, description="Search query for product name, model, or barcode"),
+    sort: Optional[str] = Query("name", description="Sort by: name, price_asc, price_desc"),
+    in_stock: Optional[bool] = Query(False, description="Show only in-stock products"),
+    limit: int = Query(50, ge=1, le=100)
+):
+    """Search products by name, model, or barcode — used by the website search bar"""
+    q = q.strip()
+    if not q:
+        raise HTTPException(status_code=400, detail="Search query cannot be empty")
+
+    query = {
+        "$or": [
+            {"name":    {"$regex": re.escape(q), "$options": "i"}},
+            {"model":   {"$regex": re.escape(q), "$options": "i"}},
+            {"barcode": {"$regex": re.escape(q), "$options": "i"}},
+        ]
+    }
+
+    if in_stock:
+        query["$nor"] = [
+            {"stock_text": {"$regex": "^Stok\\s*:\\s*0$", "$options": "i"}},
+            {"stock_text": {"$regex": "yok",     "$options": "i"}},
+            {"stock_text": {"$regex": "tükendi", "$options": "i"}},
+            {"stock_text": {"$regex": "bitti",   "$options": "i"}},
+            {"stock_text": None},
+            {"stock_text": ""},
+        ]
+
+    if sort == "price_asc":
+        sort_field = [("price_value", 1)]
+    elif sort == "price_desc":
+        sort_field = [("price_value", -1)]
+    else:
+        sort_field = [("name", 1)]
+
+    cursor = db.products.find(query, {"_id": 0}).sort(sort_field).limit(limit)
+    products = await cursor.to_list(length=limit)
+
+    usd_to_try = await fetch_usd_try_rate()
+
+    for product in products:
+        if isinstance(product.get("last_synced"), datetime):
+            product["last_synced"] = product["last_synced"].isoformat()
+        elif product.get("last_synced") is None:
+            product["last_synced"] = datetime.now(timezone.utc).isoformat()
+        product["price_try"] = calculate_final_price_try(product.get("price_value"), usd_to_try)
+
+    return products
+
+
 @api_router.get("/products/search", response_model=List[ProductResponse])
 async def search_products(
     q: str = Query(..., min_length=1, description="Search query"),
@@ -205,6 +259,8 @@ async def search_products(
         product['price_try'] = calculate_final_price_try(product.get('price_value'), usd_to_try)
     
     return products
+
+
 
 @api_router.get("/products/{model}", response_model=ProductResponse)
 async def get_product_by_model(model: str):
