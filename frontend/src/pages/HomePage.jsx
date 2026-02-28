@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Filter, Package, ArrowUpDown, CheckCircle } from "lucide-react";
 import CategorySidebar from "@/components/CategorySidebar";
 import ProductGrid from "@/components/ProductGrid";
+import BannerSlider from "@/components/BannerSlider";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -43,27 +44,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
-      {/* Hero Section */}
-      <section className="hero-gradient text-white py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="max-w-2xl">
-            <h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold font-outfit tracking-tight mb-4"
-              data-testid="hero-title"
-            >
-              Teknolojinin Yeni Adresi
-            </h1>
-            <p 
-              className="text-lg md:text-xl text-blue-100 leading-relaxed"
-              data-testid="hero-subtitle"
-            >
-              En yeni bilgisayarlar, bileşenler ve aksesuarlar en uygun fiyatlarla. 
-              Antalya'nın güvenilir teknoloji partneri.
-            </p>
-          </div>
-        </div>
-      </section>
-
+      {/* Banner Slider */}
+      <BannerSlider />
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex gap-8">
