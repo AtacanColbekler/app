@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, Menu, Phone, Mail, ChevronRight, ChevronDown } from "lucide-react";
+import { Search, Menu, Phone, Mail, ChevronRight, ChevronDown, ShoppingCart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -886,6 +886,13 @@ export default function Header() {
                 </button>
               </div>
             </form>
+            {/* Order button — Desktop */}
+            <Link to="/siparis" className="hidden md:block flex-shrink-0" data-testid="order-btn">
+              <Button className="h-11 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-semibold gap-2 whitespace-nowrap">
+                <ShoppingCart className="w-4 h-4" />
+                Sipariş Ver
+              </Button>
+            </Link>
 
             {/* Quick phone — Desktop */}
             <div className="hidden lg:flex items-center gap-2 text-sm">
@@ -923,6 +930,7 @@ export default function Header() {
             </div>
           </form>
         </div>
+        
       </div>
 
       {/* ── Desktop nav bar ──────────────────────────────────── */}

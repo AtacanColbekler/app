@@ -6,6 +6,7 @@ import HomePage from "@/pages/HomePage";
 import ProductDetailPage from "@/pages/ProductDetailPage";
 import SearchResultsPage from "@/pages/SearchResultsPage";
 import NameSearchResultsPage from "@/pages/NameSearchResultsPage";
+import OrderPage from "@/pages/OrderPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Route path="ara" element={<SearchResultsPage />} />
             <Route path="ara-urun" element={<NameSearchResultsPage />} />
             <Route path="kategori/:category" element={<HomePage />} />
+            <Route path="siparis" element={<OrderPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
