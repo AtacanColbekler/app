@@ -310,7 +310,7 @@ async def search_products_by_name(
     q: str = Query(..., min_length=1),
     sort: Optional[str] = Query("name"),
     in_stock: Optional[bool] = Query(False),
-    limit: int = Query(50, ge=1, le=100)
+    limit: int = Query(100, ge=1, le=100)
 ):
     q = q.strip()
     if not q:
@@ -342,7 +342,7 @@ async def search_products(
     q: str = Query(..., min_length=1),
     sort: Optional[str] = Query("name"),
     in_stock: Optional[bool] = Query(False),
-    limit: int = Query(50, ge=1, le=100)
+    limit: int = Query(100, ge=1, le=100)
 ):
     words = [re.escape(w) for w in q.strip().split() if w]
     if not words:
@@ -485,7 +485,7 @@ async def process_checkout(req: CheckoutRequest):
 
 
 @api_router.get("/orders", response_model=List[dict])
-async def get_orders(limit: int = Query(50, ge=1, le=200)):
+async def get_orders(limit: int = Query(100, ge=1, le=200)):
     """Get recent orders (admin)"""
     cursor = db.orders.find({}, {"_id": 0}).sort([("created_at", -1)]).limit(limit)
     orders = await cursor.to_list(length=limit)
