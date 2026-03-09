@@ -16,6 +16,7 @@ export default function ProductDetailPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchProduct = async () => {
       setLoading(true);
       setError(null);
@@ -41,7 +42,7 @@ export default function ProductDetailPage() {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
       currency: 'TRY',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 0
     }).format(value);
   };
 

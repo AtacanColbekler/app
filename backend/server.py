@@ -16,6 +16,7 @@ from bson import ObjectId
 import httpx
 import asyncio
 import re
+import math
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -146,7 +147,7 @@ async def fetch_usd_try_rate():
 def calculate_final_price_try(usd_price, usd_to_try_rate):
     if usd_price is None:
         return None
-    return round(usd_price * (1 + PROFIT_MARGIN) * usd_to_try_rate, 2)
+    return float(math.ceil(usd_price * (1 + PROFIT_MARGIN) * usd_to_try_rate))
 
 # ── Email helpers ─────────────────────────────────────────────────────────────
 

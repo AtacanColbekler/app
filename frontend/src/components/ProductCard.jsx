@@ -31,7 +31,7 @@ export default function ProductCard({ product }) {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
       currency: 'TRY',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 0
     }).format(value);
   };
 
