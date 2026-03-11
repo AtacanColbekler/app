@@ -109,16 +109,28 @@ export default function ProductDetailPage() {
     });
   };
 
+  // Returns true if the stock text represents zero / out-of-stock
+  const isZeroStock = (stockText) => {
+    if (!stockText) return false;
+    const lower = stockText.toLowerCase();
+    // Explicit "yok" / "tükendi" keywords
+    if (lower.includes("yok") || lower.includes("tüken")) return true;
+    // Numeric zero: "stok : 0", "stok:0", "stok 0", plain "0"
+    if (/stok\s*[:=]?\s*0\b/.test(lower)) return true;
+    if (/^\s*0\s*$/.test(lower)) return true;
+    return false;
+  };
+
   // Get stock styling
   const getStockStyle = (stockText) => {
     if (!stockText) return { class: "bg-slate-100 text-slate-600", text: "Bilgi Yok" };
 
     const lowerText = stockText.toLowerCase();
-    if (lowerText.includes("stok") && lowerText.includes("var")) {
-      return { class: "bg-emerald-100 text-emerald-700", text: stockText };
-    }
-    if (lowerText.includes("stok") && (lowerText.includes("yok") || lowerText.includes("tüken"))) {
+    if (isZeroStock(stockText)) {
       return { class: "bg-red-100 text-red-700", text: stockText };
+    }
+    if (lowerText.includes("var")) {
+      return { class: "bg-emerald-100 text-emerald-700", text: stockText };
     }
     if (lowerText.includes("sınırlı") || lowerText.includes("az")) {
       return { class: "bg-amber-100 text-amber-700", text: stockText };
@@ -169,9 +181,7 @@ export default function ProductDetailPage() {
 
   const stockStyle = getStockStyle(product.stock_text);
   const formattedPrice = formatPrice(product.price_try);
-  const isOutOfStock =
-    product.stock_text?.toLowerCase().includes("yok") ||
-    product.stock_text?.toLowerCase().includes("tüken");
+  const isOutOfStock = isZeroStock(product.stock_text);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50">
