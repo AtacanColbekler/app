@@ -16,6 +16,7 @@ export default function NameSearchResultsPage() {
   const [inStockOnly, setInStockOnly] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const searchProducts = async () => {
       if (!query.trim()) {
         setProducts([]);
