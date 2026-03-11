@@ -17,6 +17,7 @@ export default function HomePage() {
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState("name");
   const [inStockOnly, setInStockOnly] = useState(false);
+  
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -28,7 +29,8 @@ export default function HomePage() {
         }
         
         const response = await axios.get(`${API}/products`, { params });
-        setProducts(response.data);
+        const shuffled = sortOrder === "name" ? [...response.data].sort(() => Math.random() - 0.5) : response.data;
+        setProducts(shuffled);
       } catch (error) {
         console.error("Ürünler yüklenemedi:", error);
         setProducts([]);
